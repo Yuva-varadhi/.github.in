@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <title>Citizen, Student & Faculty Registration | Yuva Varadhi</title>
+
+  <!-- Official Favicon & Web App Icons -->
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+  <link rel="shortcut icon" href="assets/images/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/images/logo.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Supabase Cloud CDN SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    :root {
+      --navy-950: #ffffff;
+      --navy-900: #ffffff;
+      --navy-800: #f8fafc;
+      --navy-700: #f1f5f9;
+      --navy-600: #e2e8f0;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-400: #64748b;
+      --slate-300: #475569;
+      --slate-100: #0f172a;
+      --gold-500: #d97706;
+      --gold-400: #b45309;
+      --emerald-600: #059669;
+      --emerald-500: #059669;
+      --purple-500: #7c3aed;
+      --purple-600: #6d28d9;
+      --red-600: #dc2626;
+      --red-500: #ef4444;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
+      --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #ffffff;
+      color: #1e293b;
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(217, 119, 6, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(5, 150, 105, 0.02) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 3.5rem;
+    }
+
+    /* Top Brand Header */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+    .brand-logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+      background: #ffffff;
+      border: 2px solid rgba(217, 119, 6, 0.5);
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+    .brand-tagline {
+      font-size: 0.7rem;
+      color: #b45309;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    /* Card Wrapper */
+    .reg-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 2rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+    }
+    .card-header {
+      margin-bottom: 1.75rem;
+      text-align: center;
+    }
+    .card-header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .card-header p {
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 0.35rem;
+    }
+
+    /* Role & Education Toggle Groups */
+    .toggle-group {
+      display: flex;
+      background: #f1f5f9;
+      padding: 0.3rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      gap: 0.4rem;
+      border: 1px solid #e2e8f0;
+    }
+    .toggle-pill {
+      flex: 1;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #64748b;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .toggle-pill.active {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #f59e0b;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+    .toggle-pill.active-faculty {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #8b5cf6;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Form Styles */
+    .form-section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #b45309;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 1.5rem 0 0.85rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .form-section-title:first-of-type {
+      margin-top: 0;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .reg-card {
+        padding: 1.5rem 1.25rem;
+      }
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 0.4rem;
+    }
+    .form-label .required {
+      color: var(--red-500);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      color: #0f172a;
+      font-size: 0.85rem;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+      background: #ffffff;
+    }
+    .form-control::placeholder {
+      color: #94a3b8;
+      opacity: 0.8;
+    }
+
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-emerald {
+      background-color: var(--emerald-600);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+    }
+    .btn-emerald:hover {
+      background-color: #047857;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-purple {
+      background-color: var(--purple-600);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+    }
+    .btn-purple:hover {
+      background-color: #5b21b6;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background-color: transparent;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    .btn-outline:hover {
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+    .w-full { width: 100%; }
+    .d-none { display: none !important; }
+
+    /* Password Input with Eye Toggle */
+    .password-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .password-input-group .form-control {
+      padding-right: 2.5rem;
+    }
+    .eye-toggle-btn {
+      position: absolute;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #64748b;
+      padding: 0.25rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+    .eye-toggle-btn:hover {
+      color: #b45309;
+    }
+
+    /* File Upload Box (Legacy Option Restored) */
+    .file-upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.25rem;
+    }
+    .file-upload-box:hover {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+    .file-upload-badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #059669;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    /* Security Notice */
+    .security-notice {
+      background: #f8fafc;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.75rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .security-notice strong {
+      color: #b45309;
+    }
+
+    /* Toast */
+    #toastBox {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      border: 1px solid #f59e0b;
+      color: #ffffff;
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      box-shadow: var(--shadow-lg);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Header Navigation -->
+    <header class="top-header">
+      <a href="index.html" class="brand-block" title="Return to Home Portal">
+        <img
+          src="assets/images/logo.png"
+          onerror="this.onerror=null; this.src='logo.png';"
+          alt="Yuva Varadhi Official Portal Logo"
+          class="brand-logo-img"
+        />
+        <div>
+          <div class="brand-title">YUVA VARADHI</div>
+          <div class="brand-tagline">AP & TS Citizen Directorate</div>
+        </div>
+      </a>
+      <a href="index.html" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
+        ← Back to Hub
+      </a>
+    </header>
+
+    <!-- Registration Card -->
+    <main class="reg-card">
+      <div class="card-header">
+        <h1>Registration Portal</h1>
+        <p>Enroll as a Student or Faculty Member for access to official educational vaults, jobs radar, and institutional support.</p>
+      </div>
+
+      <!-- Tier-1 Role Toggle: Student vs Faculty Member -->
+      <div class="toggle-group" id="mainRoleToggle">
+        <button type="button" class="toggle-pill active" id="pillStudentMode">
+          🎓 Student Registration
+        </button>
+        <button type="button" class="toggle-pill" id="pillFacultyMode">
+          👨‍🏫 Teacher / Faculty Registration
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           FORM 1: STUDENT & CITIZEN ONBOARDING (With Previous Education Options)
+           ==================================================================== -->
+      <form id="studentCitizenForm">
+        <!-- 1. Personal Identity -->
+        <div class="form-section-title">
+          <span>👤</span> 1. Personal Identity
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="stuFullName">
+            Full Legal Name <span class="required">*</span>
+          </label>
+          <input type="text" id="stuFullName" class="form-control" placeholder="e.g. Kondaveeti Sai Kumar" required maxlength="60" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="stuMobile">
+              Mobile Number (10 Digits) <span class="required">*</span>
+            </label>
+            <input type="tel" id="stuMobile" class="form-control" placeholder="9848011223" pattern="[0-9]{10}" required maxlength="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stuDob">
+              Date of Birth <span class="required">*</span>
+            </label>
+            <input type="date" id="stuDob" class="form-control" required />
+          </div>
+        </div>
+
+        <!-- 2. Location (State & District) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="stuState">
+              State <span class="required">*</span>
+            </label>
+            <select id="stuState" class="form-control" required>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Telangana">Telangana</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stuDistrict">
+              District <span class="required">*</span>
+            </label>
+            <input type="text" id="stuDistrict" class="form-control" placeholder="e.g. Guntur / Visakhapatnam / Hyderabad" required maxlength="50" />
+          </div>
+        </div>
+
+        <!-- 3. Dynamic Education Level Switcher (Previous Options Restored) -->
+        <div class="form-section-title">
+          <span>📚</span> 2. Education Level & Institutional Track
+        </div>
+
+        <div class="toggle-group" id="eduLevelToggle" style="margin-bottom: 1rem;">
+          <button type="button" class="toggle-pill active" id="eduSchoolBtn">
+            🏫 School (5th - 10th)
+          </button>
+          <button type="button" class="toggle-pill" id="eduCollegeBtn">
+            🎓 College (UG / Engineering / PG)
+          </button>
+        </div>
+
+        <!-- Sub-section A: School Specific Fields -->
+        <div id="schoolFieldsContainer">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="stuSchoolName">School Name</label>
+              <input type="text" id="stuSchoolName" class="form-control" placeholder="e.g. Zilla Parishad High School, Guntur" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stuSchoolStudentId">Student ID / Roll Number</label>
+              <input type="text" id="stuSchoolStudentId" class="form-control" placeholder="e.g. ROLL-1045 or STU-2026" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stuSchoolClass">Class Level</label>
+            <select id="stuSchoolClass" class="form-control">
+              <option value="Class 5">5th Class</option>
+              <option value="Class 6">6th Class</option>
+              <option value="Class 7">7th Class</option>
+              <option value="Class 8">8th Class</option>
+              <option value="Class 9">9th Class</option>
+              <option value="Class 10" selected>10th Class (SSC Board)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sub-section B: College Specific Fields (Hidden initially) -->
+        <div id="collegeFieldsContainer" class="d-none">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="stuCollegeName">College / University Name <span class="required">*</span></label>
+              <input type="text" id="stuCollegeName" class="form-control" placeholder="e.g. Chalapathi Institute of Technology" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stuStudentId">Student ID / Roll Number <span class="required">*</span></label>
+              <input type="text" id="stuStudentId" class="form-control" placeholder="e.g. 23CIT0501 or STU-2026" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="stuBranch">Branch / Department</label>
+              <input type="text" id="stuBranch" class="form-control" placeholder="e.g. Computer Science & Engineering (CSE)" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stuAcademicYear">Academic Year</label>
+              <select id="stuAcademicYear" class="form-control">
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year" selected>3rd Year</option>
+                <option value="4th Year">4th Year</option>
+                <option value="Post Graduate">Post Graduate (PG / M.Tech / MBA)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 4. Account Credentials -->
+        <div class="form-section-title">
+          <span>🔐</span> 3. Account Access Credentials
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="stuEmail">
+            Official / Personal Email Address <span class="required">*</span>
+          </label>
+          <input type="email" id="stuEmail" class="form-control" placeholder="sai.kumar@gmail.com" required maxlength="80" />
+        </div>
+
+        <!-- 4. Student Institutional ID Card (Legacy Option Restored) -->
+        <div class="form-group">
+          <label class="form-label" for="stuIdCardFile">
+            Student Institutional ID Card (Optional)
+          </label>
+          <div class="file-upload-box" id="stuFileUploadBox" title="Click to attach Student ID Card">
+            <input type="file" id="stuIdCardFile" accept="image/*,.pdf" style="display: none;" />
+            <div id="stuUploadPrompt">
+              <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🪪</div>
+              <div style="font-size: 0.82rem; font-weight: 600; color: var(--slate-100);">Click or drag to attach Student ID Card</div>
+              <div style="font-size: 0.72rem; color: var(--slate-400);">Supports PNG, JPG, PDF (Max 5MB)</div>
+            </div>
+            <div id="stuFileChosen" class="d-none">
+              <span class="file-upload-badge" id="stuFileNameDisplay">student_id_card.pdf</span>
+              <div style="font-size: 0.75rem; color: var(--emerald-500); font-weight: 600; margin-top: 0.35rem;">✓ File Attached Ready for Record Vault</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="stuPassword">
+              Create Password <span class="required">*</span>
+            </label>
+            <div class="password-input-group">
+              <input type="password" autocomplete="new-password" id="stuPassword" class="form-control" placeholder="Min 6 characters" required minlength="6" />
+              <button type="button" class="eye-toggle-btn" data-target="stuPassword" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stuConfirmPassword">
+              Confirm Password <span class="required">*</span>
+            </label>
+            <div class="password-input-group">
+              <input type="password" autocomplete="new-password" id="stuConfirmPassword" class="form-control" placeholder="Re-type password" required minlength="6" />
+              <button type="button" class="eye-toggle-btn" data-target="stuConfirmPassword" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anti-Self-Registration Immutable Scope -->
+        <input type="hidden" id="stuRole" value="student" />
+
+        <div class="security-notice">
+          <strong>🛡️ Anti-Self-Registration Protocol:</strong> Citizen and Student accounts are granted self-isolation personal vault rights. Administrative tiers (Module Admin & Sub-Admin) can only be authorized via executive delegation.
+        </div>
+
+        <button type="submit" class="btn btn-emerald w-full" style="font-size: 1rem; padding: 0.85rem;">
+          Complete Student Registration →
+        </button>
+      </form>
+
+      <!-- ====================================================================
+           FORM 2: TEACHER / FACULTY ONBOARDING (Previous Options Restored)
+           ==================================================================== -->
+      <form id="facultyRegisterForm" class="d-none">
+        <!-- 1. Faculty Identity -->
+        <div class="form-section-title" style="color: var(--purple-500);">
+          <span>👨‍🏫</span> 1. Faculty Member Identity
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="facFullName">
+            Full Legal Name (with Title) <span class="required">*</span>
+          </label>
+          <input type="text" id="facFullName" class="form-control" placeholder="e.g. Dr. K. Ramanjaneyulu" required maxlength="60" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="facMobile">
+              Mobile Number (10 Digits) <span class="required">*</span>
+            </label>
+            <input type="tel" id="facMobile" class="form-control" placeholder="9849112233" pattern="[0-9]{10}" required maxlength="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="facDob">
+              Date of Birth <span class="required">*</span>
+            </label>
+            <input type="date" id="facDob" class="form-control" required />
+          </div>
+        </div>
+
+        <!-- 2. Academic Institution & Department -->
+        <div class="form-section-title" style="color: var(--purple-500);">
+          <span>🏛️</span> 2. Institutional Affiliation
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="facInstitution">
+              College / Institution Name <span class="required">*</span>
+            </label>
+            <input type="text" id="facInstitution" class="form-control" placeholder="e.g. Chalapathi Institute of Technology" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="facEmployeeId">
+              Employee ID / Faculty Code
+            </label>
+            <input type="text" id="facEmployeeId" class="form-control" placeholder="e.g. CIT-FAC-204" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="facDepartment">
+              Department <span class="required">*</span>
+            </label>
+            <input type="text" id="facDepartment" class="form-control" placeholder="e.g. Computer Science & Engineering" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="facSubjects">
+              Handled Subjects / Specialization <span class="required">*</span>
+            </label>
+            <input type="text" id="facSubjects" class="form-control" placeholder="e.g. Data Structures, AI & ML, Python" required />
+          </div>
+        </div>
+
+        <!-- 3. Credentials -->
+        <div class="form-section-title" style="color: var(--purple-500);">
+          <span>🔐</span> 3. Faculty Access Credentials
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="facEmail">
+            Official Institutional Email <span class="required">*</span>
+          </label>
+          <input type="email" id="facEmail" class="form-control" placeholder="faculty.cse@cit.edu.in" required maxlength="80" />
+        </div>
+
+        <!-- 3. Faculty Institutional ID Card (Legacy Option Restored) -->
+        <div class="form-group">
+          <label class="form-label" for="facIdCardFile">
+            Faculty Institutional ID Card <span class="required">*</span>
+          </label>
+          <div class="file-upload-box" id="facFileUploadBox" title="Click to attach Faculty ID Card">
+            <input type="file" id="facIdCardFile" accept="image/*,.pdf" style="display: none;" />
+            <div id="facUploadPrompt">
+              <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🪪</div>
+              <div style="font-size: 0.82rem; font-weight: 600; color: var(--slate-100);">Click or drag to attach Official Faculty ID Card</div>
+              <div style="font-size: 0.72rem; color: var(--slate-400);">Supports PNG, JPG, PDF (Max 5MB)</div>
+            </div>
+            <div id="facFileChosen" class="d-none">
+              <span class="file-upload-badge" id="facFileNameDisplay">faculty_id_card.pdf</span>
+              <div style="font-size: 0.75rem; color: var(--emerald-500); font-weight: 600; margin-top: 0.35rem;">✓ File Attached Ready for Auto-Verification</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="facPassword">
+              Create Password <span class="required">*</span>
+            </label>
+            <div class="password-input-group">
+              <input type="password" autocomplete="new-password" id="facPassword" class="form-control" placeholder="Min 6 characters" required minlength="6" />
+              <button type="button" class="eye-toggle-btn" data-target="facPassword" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="facConfirmPassword">
+              Confirm Password <span class="required">*</span>
+            </label>
+            <div class="password-input-group">
+              <input type="password" autocomplete="new-password" id="facConfirmPassword" class="form-control" placeholder="Re-enter password" required minlength="6" />
+              <button type="button" class="eye-toggle-btn" data-target="facConfirmPassword" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Immutable Faculty Role -->
+        <input type="hidden" id="facRole" value="faculty" />
+
+        <div class="security-notice" style="border-color: rgba(139, 92, 246, 0.35);">
+          <strong>👨‍🏫 Verified Faculty Protocol:</strong> Faculty accounts receive educational upload privileges, academic schedule publishing authority, and student batch verification desks.
+        </div>
+
+        <button type="submit" class="btn btn-purple w-full" style="font-size: 1rem; padding: 0.85rem;">
+          Complete Faculty Registration →
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--slate-400);">
+        Already have an account? <a href="index.html" style="color: var(--gold-400); text-decoration: none; font-weight: 600;">Sign in directly on Hub →</a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toastBox">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const DB_KEYS = {
+        USERS: 'yv_users_v2',
+        ACTIVE_USER: 'yv_active_user_v2',
+        AUDIT: 'yv_audit_logs_v2'
+      };
+
+      function getStore(key, defaultValue = []) {
+        try {
+          const item = localStorage.getItem(key);
+          return item ? JSON.parse(item) : defaultValue;
+        } catch (e) {
+          return defaultValue;
+        }
+      }
+
+      function setStore(key, val) {
+        try {
+          localStorage.setItem(key, JSON.stringify(val));
+        } catch (e) {
+          console.warn('Storage error:', e);
+        }
+      }
+
+      function sanitize(val) {
+        if (typeof val !== 'string') return val;
+        return val
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#x27;')
+          .replace(/\//g, '&#x2F;');
+      }
+
+      function showToast(msg, type = 'info') {
+        const toast = document.getElementById('toastBox');
+        const icon = document.getElementById('toastIcon');
+        const text = document.getElementById('toastMsg');
+        if (!toast) return;
+
+        icon.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+        text.textContent = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => { toast.style.display = 'none'; }, 3500);
+      }
+
+      // Web Crypto API Security Engine for Password Hashing
+      const CryptoSecurity = {
+        generateSalt(len = 16) {
+          const arr = new Uint8Array(len);
+          if (window.crypto && window.crypto.getRandomValues) {
+            window.crypto.getRandomValues(arr);
+          }
+          return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+        },
+        async sha256(str) {
+          if (!window.crypto || !window.crypto.subtle) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+              hash = ((hash << 5) - hash) + str.charCodeAt(i);
+              hash |= 0;
+            }
+            return 'fallback_' + Math.abs(hash).toString(16);
+          }
+          const encoder = new TextEncoder();
+          const data = encoder.encode(str);
+          const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+          return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        },
+        async hashPassword(plainText, salt = null) {
+          if (!plainText) return '';
+          if (!salt) salt = this.generateSalt(16);
+          const rawHash = await this.sha256(`${salt}::${plainText}::yv_enterprise_salt_2026`);
+          return `sha256$${salt}$${rawHash}`;
+        },
+        generateSessionToken() {
+          const arr = new Uint8Array(32);
+          if (window.crypto && window.crypto.getRandomValues) {
+            window.crypto.getRandomValues(arr);
+          }
+          const token = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+          return {
+            token: 'yv_tok_' + token,
+            issuedAt: Date.now(),
+            expiresAt: Date.now() + (3600 * 1000 * 24)
+          };
+        },
+        async computeAuditHash(prevHash, entry) {
+          const canonical = `${prevHash || 'GENESIS_SEAL_AP_TS_2026'}::${entry.id}::${entry.timestamp}::${entry.actor}::${entry.action}::${entry.details}`;
+          return await this.sha256(canonical);
+        }
+      };
+
+      function logAudit(actor, action, details) {
+        const logs = getStore(DB_KEYS.AUDIT, []);
+        const prevHash = (logs.length > 0 && logs[0].hash) ? logs[0].hash : 'GENESIS_SEAL_AP_TS_2026';
+        const entry = {
+          id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+          timestamp: new Date().toISOString(),
+          actor: actor || 'System',
+          action,
+          details,
+          prevHash
+        };
+        return CryptoSecurity.computeAuditHash(prevHash, entry).then(h => {
+          entry.hash = h;
+          logs.unshift(entry);
+          setStore(DB_KEYS.AUDIT, logs);
+          return entry;
+        }).catch(() => {
+          entry.hash = 'sha256_unsealed';
+          logs.unshift(entry);
+          setStore(DB_KEYS.AUDIT, logs);
+          return entry;
+        });
+      }
+
+      // --- UI TOGGLES: ROLE MODE (Student vs Faculty) ---
+      const pillStudent = document.getElementById('pillStudentMode');
+      const pillFaculty = document.getElementById('pillFacultyMode');
+      const formStudent = document.getElementById('studentCitizenForm');
+      const formFaculty = document.getElementById('facultyRegisterForm');
+
+      pillStudent.onclick = function () {
+        pillStudent.classList.add('active');
+        pillStudent.classList.remove('active-faculty');
+        pillFaculty.classList.remove('active');
+        pillFaculty.classList.remove('active-faculty');
+        formStudent.classList.remove('d-none');
+        formFaculty.classList.add('d-none');
+      };
+
+      pillFaculty.onclick = function () {
+        pillFaculty.classList.add('active-faculty');
+        pillStudent.classList.remove('active');
+        formFaculty.classList.remove('d-none');
+        formStudent.classList.add('d-none');
+      };
+
+      // --- UI TOGGLES: EDUCATION LEVEL (School vs College vs General) ---
+      // --- UI TOGGLES: EDUCATION LEVEL (School vs College) ---
+      let currentEduMode = 'school';
+      const btnSchool = document.getElementById('eduSchoolBtn');
+      const btnCollege = document.getElementById('eduCollegeBtn');
+      const schoolFields = document.getElementById('schoolFieldsContainer');
+      const collegeFields = document.getElementById('collegeFieldsContainer');
+
+      btnSchool.onclick = function () {
+        currentEduMode = 'school';
+        btnSchool.classList.add('active');
+        btnCollege.classList.remove('active');
+        schoolFields.classList.remove('d-none');
+        collegeFields.classList.add('d-none');
+      };
+
+      btnCollege.onclick = function () {
+        currentEduMode = 'college';
+        btnCollege.classList.add('active');
+        btnSchool.classList.remove('active');
+        collegeFields.classList.remove('d-none');
+        schoolFields.classList.add('d-none');
+      };
+
+      // --- FORM 1: STUDENT / CITIZEN SUBMISSION ---
+      formStudent.onsubmit = async function (e) {
+        e.preventDefault();
+        try {
+          const name = sanitize(document.getElementById('stuFullName').value.trim());
+          const mobile = sanitize(document.getElementById('stuMobile').value.trim());
+          const dob = document.getElementById('stuDob').value;
+          const state = sanitize(document.getElementById('stuState').value);
+          const district = sanitize(document.getElementById('stuDistrict').value.trim());
+          const email = document.getElementById('stuEmail').value.trim().toLowerCase();
+          const password = document.getElementById('stuPassword').value.trim();
+          const confirmPassword = document.getElementById('stuConfirmPassword').value.trim();
+
+          if (password !== confirmPassword) {
+            throw new Error('Password mismatch: Please make sure your passwords match.');
+          }
+
+          let trackInfo = 'School';
+          let colOrScName = '';
+          let studentIdVal = '';
+          if (currentEduMode === 'college') {
+            colOrScName = sanitize(document.getElementById('stuCollegeName').value.trim()) || 'College';
+            studentIdVal = sanitize(document.getElementById('stuStudentId').value.trim());
+            const branch = sanitize(document.getElementById('stuBranch').value.trim()) || 'Degree';
+            const year = document.getElementById('stuAcademicYear').value;
+            trackInfo = `${branch}, ${year} (${colOrScName})`;
+          } else {
+            colOrScName = sanitize(document.getElementById('stuSchoolName').value.trim()) || 'School';
+            studentIdVal = sanitize(document.getElementById('stuSchoolStudentId')?.value.trim() || '');
+            const scClass = document.getElementById('stuSchoolClass').value;
+            trackInfo = `${scClass} (${colOrScName})`;
+          }
+
+          const users = getStore(DB_KEYS.USERS, []);
+          if (users.some(u => u.email.toLowerCase() === email)) {
+            throw new Error('An account with this email address is already registered.');
+          }
+
+          const stuIdCardFile = document.getElementById('stuIdCardFile')?.files?.[0];
+          const hashedPassword = await CryptoSecurity.hashPassword(password);
+
+          const newStudent = {
+            id: 'usr_stu_' + Date.now(),
+            username: email.split('@')[0],
+            name,
+            email,
+            mobile,
+            dob,
+            state,
+            district,
+            educationLevel: currentEduMode,
+            studentId: studentIdVal,
+            collegeName: colOrScName,
+            track: trackInfo,
+            idCardFileName: stuIdCardFile ? stuIdCardFile.name : '',
+            password: hashedPassword,
+            role: 'student',
+            createdAt: new Date().toISOString()
+          };
+
+          if (typeof fetch === 'function' && window.location && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+            try {
+              await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  username: newStudent.username,
+                  fullName: newStudent.name,
+                  email: newStudent.email,
+                  mobile: newStudent.mobile,
+                  dob: newStudent.dob,
+                  password: password,
+                  role: 'student',
+                  educationTrack: currentEduMode,
+                  studentId: studentIdVal,
+                  collegeName: colOrScName
+                })
+              });
+            } catch (apiErr) {
+              console.warn('Backend sync note:', apiErr);
+            }
+          }
+
+          users.push(newStudent);
+          setStore(DB_KEYS.USERS, users);
+
+          const sessionStudent = { ...newStudent };
+          delete sessionStudent.password;
+          sessionStudent.sessionToken = CryptoSecurity.generateSessionToken();
+          setStore(DB_KEYS.ACTIVE_USER, sessionStudent);
+
+          logAudit(newStudent.username, 'STUDENT_REGISTRATION', `Enrolled ${name} [${trackInfo}].`);
+
+          showToast(`Welcome, ${name}! Redirecting to Yuva Varadhi Hub...`, 'success');
+          setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      };
+
+      // --- FORM 2: FACULTY / TEACHER SUBMISSION ---
+      formFaculty.onsubmit = async function (e) {
+        e.preventDefault();
+        try {
+          const name = sanitize(document.getElementById('facFullName').value.trim());
+          const mobile = sanitize(document.getElementById('facMobile').value.trim());
+          const dob = document.getElementById('facDob').value;
+          const institution = sanitize(document.getElementById('facInstitution').value.trim());
+          const employeeId = sanitize(document.getElementById('facEmployeeId').value.trim()) || `FAC-${Date.now().toString().slice(-4)}`;
+          const department = sanitize(document.getElementById('facDepartment').value.trim());
+          const subjects = sanitize(document.getElementById('facSubjects').value.trim());
+          const email = document.getElementById('facEmail').value.trim().toLowerCase();
+          const password = document.getElementById('facPassword').value.trim();
+          const confirmPassword = document.getElementById('facConfirmPassword').value.trim();
+
+          if (password !== confirmPassword) {
+            throw new Error('Password mismatch: Passwords do not match.');
+          }
+
+          const users = getStore(DB_KEYS.USERS, []);
+          if (users.some(u => u.email.toLowerCase() === email)) {
+            throw new Error('A faculty account with this official email already exists.');
+          }
+
+          const facIdCardFile = document.getElementById('facIdCardFile')?.files?.[0];
+          const hashedPassword = await CryptoSecurity.hashPassword(password);
+
+          const newFaculty = {
+            id: 'usr_fac_' + Date.now(),
+            username: email.split('@')[0],
+            name,
+            email,
+            mobile,
+            dob,
+            institution,
+            employeeId,
+            department,
+            handledSubjects: subjects,
+            track: `Faculty (${department})`,
+            idCardFileName: facIdCardFile ? facIdCardFile.name : '',
+            password: hashedPassword,
+            role: 'faculty',
+            createdAt: new Date().toISOString()
+          };
+
+          users.push(newFaculty);
+          setStore(DB_KEYS.USERS, users);
+
+          const sessionFaculty = { ...newFaculty };
+          delete sessionFaculty.password;
+          sessionFaculty.sessionToken = CryptoSecurity.generateSessionToken();
+          setStore(DB_KEYS.ACTIVE_USER, sessionFaculty);
+
+          logAudit(newFaculty.username, 'FACULTY_REGISTRATION', `Faculty ${name} registered at [${institution}].`);
+
+          showToast(`Faculty registered! Welcome, ${name}...`, 'success');
+          setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      };
+
+      // --- PASSWORD EYE TOGGLES ---
+      document.querySelectorAll('.eye-toggle-btn').forEach(btn => {
+        btn.onclick = function () {
+          const targetId = this.getAttribute('data-target');
+          const input = document.getElementById(targetId);
+          if (input) {
+            if (input.type === 'password') {
+              input.type = 'text';
+              this.textContent = '🔒';
+            } else {
+              input.type = 'password';
+              this.textContent = '👁️';
+            }
+          }
+        };
+      });
+
+      // --- FILE UPLOAD DROP/ATTACH WIRING ---
+      function setupFileUpload(boxId, inputId, promptId, chosenId, nameDisplayId) {
+        const box = document.getElementById(boxId);
+        const input = document.getElementById(inputId);
+        const prompt = document.getElementById(promptId);
+        const chosen = document.getElementById(chosenId);
+        const nameDisp = document.getElementById(nameDisplayId);
+        if (!box || !input) return;
+
+        box.onclick = () => input.click();
+        input.onchange = () => {
+          if (input.files && input.files[0]) {
+            nameDisp.textContent = input.files[0].name;
+            prompt.classList.add('d-none');
+            chosen.classList.remove('d-none');
+          } else {
+            prompt.classList.remove('d-none');
+            chosen.classList.add('d-none');
+          }
+        };
+      }
+      setupFileUpload('stuFileUploadBox', 'stuIdCardFile', 'stuUploadPrompt', 'stuFileChosen', 'stuFileNameDisplay');
+      setupFileUpload('facFileUploadBox', 'facIdCardFile', 'facUploadPrompt', 'facFileChosen', 'facFileNameDisplay');
+
+    })();
+  </script>
+</body>
+</html>
